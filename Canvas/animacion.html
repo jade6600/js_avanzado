@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Animación de Partículas en Canvas</title>
+  <style>
+    body { margin: 0; overflow: hidden; background: #111; }
+    canvas { display: block; }
+  </style>
+</head>
+<body>
+  <canvas id="lienzoAnimacion"></canvas>
+
+  <script>
+    const canvas = document.getElementById('lienzoAnimacion');
+    const ctx = canvas.getContext('2d');
+
+    // Ajustar el tamaño del canvas a la pantalla completa
+    function ajustarPantalla() {
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+    }
+    ajustarPantalla();
+    window.addEventListener('resize', ajustarPantalla);
+
+    // Contenedor de partículas
+    const particulas = [];
+    const numeroParticulas = 80;
+
+    // Estructura de una partícula
+    class Particula {
+    constructor() {
+        this.x = Math.random() * canvas.width;
+        this.y = Math.random() * canvas.height;
+        this.radio = Math.random() * 5 + 2;
+        this.velocidadX = (Math.random() - 0.5) * 2;
+        this.velocidadY = (Math.random() - 0.5) * 2;
+        this.color = `hsl(${Math.random() * 360}, 70%, 60%)`;
+    }
+
+      // Actualizar posición y detectar rebotes
+    actualizar() {
+        this.x += this.velocidadX;
+        this.y += this.velocidadY;
+
+        if (this.x - this.radio < 0 || this.x + this.radio > canvas.width) this.velocidadX *= -1;
+        if (this.y - this.radio < 0 || this.y + this.radio > canvas.height) this.velocidadY *= -1;
+    }
+
+      // Dibujar en el lienzo
+    dibujar() {
+        ctx.beginPath();
+        ctx.arc(this.x, this.y, this.radio, 0, Math.PI * 2);
+        ctx.fillStyle = this.color;
+        ctx.fill();
+    }
+    }
+
+    // Inicializar el arreglo de partículas
+    for (let i = 0; i < numeroParticulas; i++) {
+    particulas.push(new Particula());
+    }
+
+    // Bucle infinito de animación
+    function bucleAnimacion() {
+      // Efecto de rastro semitransparente
+    ctx.fillStyle = 'rgba(17, 17, 17, 0.1)';
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+    particulas.forEach(p => {
+        p.actualizar();
+        p.dibujar();
+    });
+
+    requestAnimationFrame(bucleAnimacion);
+    }
+
+    bucleAnimacion();
+</script>
+</body>
+</html>

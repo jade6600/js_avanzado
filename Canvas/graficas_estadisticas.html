@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<title>Gráfica Estadística en Canvas</title>
+<style>
+    body { font-family: sans-serif; display: flex; justify-content: center; align-items: center; height: 100vh; background: #f0f2f5; margin: 0; }
+    .contenedor { background: white; padding: 20px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
+    h2 { margin-top: 0; text-align: center; color: #333; }
+</style>
+</head>
+<body>
+<div class="contenedor">
+    <h2>Métricas de Ventas Trimestrales</h2>
+    <canvas id="lienzoGrafica" width="500" height="300"></canvas>
+</div>
+
+<script>
+    const canvas = document.getElementById('lienzoGrafica');
+    const ctx = canvas.getContext('2d');
+
+    // Datos de la estadística (X = Mes, Y = Unidades Vendidas)
+    const estadisticas = [
+    { mes: 'Ene', ventas: 50 },
+    { mes: 'Feb', ventas: 120 },
+    { mes: 'Mar', ventas: 80 },
+    { mes: 'Abr', ventas: 190 },
+    { mes: 'May', ventas: 140 },
+    { mes: 'Jun', ventas: 230 }
+    ];
+
+    // Configuración del área de la gráfica
+    const margen = 50;
+    const anchoGrafica = canvas.width - margen * 2;
+    const altoGrafica = canvas.height - margen * 2;
+    const maxValorY = 250; // Límite máximo establecido para los datos
+
+    // 1. Dibujar Cuadrícula de Fondo
+    ctx.strokeStyle = '#e9ecef';
+    ctx.lineWidth = 1;
+    for (let i = 0; i <= 5; i++) {
+      let y = margen + (altoGrafica / 5) * i;
+    ctx.beginPath();
+    ctx.moveTo(margen, y);
+    ctx.lineTo(canvas.width - margen, y);
+    ctx.stroke();
+
+      // Etiquetas del Eje Y
+    ctx.fillStyle = '#6c757d';
+    ctx.font = '12px sans-serif';
+    let valorEtiquetaY = maxValorY - (maxValorY / 5) * i;
+    ctx.fillText(valorEtiquetaY, margen - 30, y + 4);
+    }
+
+    // 2. Calcular Coordenadas de los Datos
+    const puntos = estadisticas.map((d, index) => {
+      let x = margen + (anchoGrafica / (estadisticas.length - 1)) * index;
+      let y = (canvas.height - margen) - (d.ventas / maxValorY) * altoGrafica;
+    return { x, y, mes: d.mes, ventas: d.ventas };
+    });
+
+    // 3. Dibujar la Línea Estadística
+    ctx.beginPath();
+    ctx.moveTo(puntos[0].x, puntos[0].y);
+    for (let i = 1; i < puntos.length; i++) {
+    ctx.lineTo(puntos[i].x, puntos[i].y);
+    }
+    ctx.strokeStyle = '#007bff';
+    ctx.lineWidth = 3;
+    ctx.stroke();
+
+    // 4. Dibujar Nodos (Puntos) y Etiquetas del Eje X
+    puntos.forEach(p => {
+      // Círculo exterior azul
+    ctx.beginPath();
+    ctx.arc(p.x, p.y, 5, 0, Math.PI * 2);
+    ctx.fillStyle = '#007bff';
+    ctx.fill();
+
+      // Centro blanco para estilo moderno
+    ctx.beginPath();
+      ctx.arc(p.x, p.y, 2, 0, Math.PI * 2);
+    ctx.fillStyle = '#fff';
+    ctx.fill();
+
+      // Texto de valores sobre los nodos
+    ctx.fillStyle = '#212529';
+    ctx.font = 'bold 11px sans-serif';
+    ctx.fillText(p.ventas, p.x - 10, p.y - 12);
+
+      // Etiquetas del Eje X (Meses)
+    ctx.fillStyle = '#6c757d';
+    ctx.font = '12px sans-serif';
+    ctx.fillText(p.mes, p.x - 10, canvas.height - margen + 20);
+    });
+
+    // 5. Dibujar los Ejes Principales
+    ctx.strokeStyle = '#495057';
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    ctx.moveTo(margen, margen);
+    ctx.lineTo(margen, canvas.height - margen); // Eje Y
+    ctx.lineTo(canvas.width - margen, canvas.height - margen); // Eje X
+    ctx.stroke();
+</script>
+</body>
+</html>
